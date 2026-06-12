@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Retour Intervention">
+<title>Retour mail intervention</title>
+<style>
+  :root {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1a18;
+    --muted: #7a7870;
+    --accent: #1a3a5c;
+    --accent-light: #e8eef5;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 2rem;
+  }
+
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 1.1rem 1.25rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  header h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+  header p { font-size: 11px; opacity: 0.65; margin-top: 1px; }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    margin: 1rem 1rem 0;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 0.75rem 1rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-header svg { width: 14px; height: 14px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .card-header span { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .field {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .field:last-child { border-bottom: none; }
+
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .field input, .field textarea {
+    font-size: 16px;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+    padding: 0;
+    resize: none;
+    line-height: 1.5;
+    -webkit-appearance: none;
+  }
+
+  .field select {
+    font-size: 16px;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+    padding: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  .field select:focus { background: transparent; }
+    color: #bbb;
+    font-size: 15px;
+  }
+
+  .field input:focus, .field textarea:focus {
+    background: transparent;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: #bbb;
+    font-style: italic;
+  }
+
+  .btn-wrap {
+    padding: 1rem;
+  }
+
+  .btn-send {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: inherit;
+    letter-spacing: -0.01em;
+    transition: opacity 0.15s;
+  }
+
+  .btn-send:active { opacity: 0.82; transform: scale(0.99); }
+
+  .btn-send svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0.5rem 1rem 0;
+    line-height: 1.5;
+  }
+
+  .note strong { color: var(--text); }
+
+  .toast {
+    display: none;
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  .toast.show { display: block; animation: fadeup 0.2s ease; }
+  @keyframes fadeup { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111110;
+      --surface: #1c1c1a;
+      --border: #2e2e2b;
+      --text: #f0efe9;
+      --muted: #888780;
+      --accent: #1e4a80;
+      --accent-light: #1a2a3a;
+    }
+    .field input, .field textarea { color-scheme: dark; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+  </div>
+  <div>
+    <h1>Retour mail intervention</h1>
+    <p>Remplir puis générer le mail</p>
+  </div>
+</header>
+
+<div class="card">
+  <div class="card-header">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Référence</span>
+  </div>
+  <div class="field">
+    <label>N° intervention (depuis l'app)</label>
+    <input type="text" id="numero" placeholder="Copier depuis l'app" autocomplete="off" />
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Détails du rapport</span>
+  </div>
+
+  <div class="field">
+    <label>Type de mandat :</label>
+    <select id="typemandat">
+      <option value="">— Sélectionner —</option>
+      <option value="1ère installation forfait complet F100">1ère installation forfait complet F100</option>
+      <option value="2ème installation forfait complet F100">2ème installation forfait complet F100</option>
+      <option value="2ème installation forfait complet F101">2ème installation forfait complet F101</option>
+      <option value="Mandat Splicing">Mandat Splicing</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Positions supplémentaires – colonne montante <span style="font-weight:400;color:#bbb;">(optionnel)</span></label>
+    <textarea id="positions" rows="3" placeholder="Copier chaque position depuis l'app, une par ligne"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Flat ID :</label>
+    <input type="text" id="flatid" placeholder="Ex : 01.02 (étage.appartement)" autocomplete="off" inputmode="numeric" />
+  </div>
+
+  <div class="field">
+    <label>4FS – Longueur du câble :</label>
+    <input type="text" id="quatrefesses" placeholder="Ex : 12m" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label>OTO emplacement :</label>
+    <input type="text" id="oto" placeholder="" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label>Type d'adresse :</label>
+    <select id="typeadresse">
+      <option value="">— Sélectionner —</option>
+      <option value="VERTE">VERTE</option>
+      <option value="JAUNE">JAUNE</option>
+      <option value="ROUGE">ROUGE</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Accès colonne BEP :</label>
+    <input type="text" id="bep" placeholder="" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label>Signalement des dégâts :</label>
+    <textarea id="degats" rows="3" placeholder="Décrire les dégâts observés..."></textarea>
+  </div>
+</div>
+
+<div class="btn-wrap">
+  <button class="btn-send" onclick="genererMail()">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    Générer le mail
+  </button>
+</div>
+
+<p class="note">
+  Votre app mail s'ouvre avec le rapport pré-rempli.<br>
+  <strong>Ajoutez vos photos puis envoyez.</strong>
+</p>
+
+<div class="toast" id="toast">Champ manquant — ajoutez le n° d'intervention</div>
+
+<script>
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  function val(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  function genererMail() {
+    var numero    = val('numero');
+    var typemandat = val('typemandat');
+    var positions  = val('positions');
+    var flatid    = val('flatid');
+    var qf        = val('quatrefesses');
+    var oto       = val('oto');
+    var typeadr   = val('typeadresse');
+    var bep       = val('bep');
+    var degats    = val('degats');
+
+    if (!numero) { showToast('Ajoutez le n° d\'intervention'); return; }
+
+    var objet = 'Rapport intervention – ' + numero;
+
+    var corps =
+      'Hello,\n\n' +
+      'Type de mandat : ' + (typemandat || '—') + '\n' +
+      (positions ? 'Positions supplémentaires (colonne montante) : ' + positions + '\n' : '') +
+      'Flat ID : ' + (flatid || '—') + '\n' +
+      '4FS (longueur câble) : ' + (qf || '—') + '\n' +
+      'OTO emplacement : ' + (oto || '—') + '\n' +
+      'Type d\'adresse : ' + (typeadr || '—') + '\n' +
+      'Accès colonne BEP : ' + (bep || '—') + '\n' +
+      'Signalement des dégâts : ' + (degats || '—') + '\n\n' +
+      'Cordialement';
+
+    var mailto = 'mailto:info@schweizerdigital.ch' +
+      '?subject=' + encodeURIComponent(objet) +
+      '&body=' + encodeURIComponent(corps);
+
+    window.location.href = mailto;
+  }
+</script>
+</body>
+</html>
